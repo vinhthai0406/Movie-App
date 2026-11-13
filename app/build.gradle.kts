@@ -68,6 +68,10 @@ dependencies {
     // Coil
     implementation(libs.coil.compose)
     implementation(libs.coil3.coil.network.okhttp)
+    // Icon
+    implementation(libs.androidx.compose.material.icons.extended)
+    // Play video youtube
+    implementation("com.pierfrancescosoffritti.androidyoutubeplayer:core:13.1.0")
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

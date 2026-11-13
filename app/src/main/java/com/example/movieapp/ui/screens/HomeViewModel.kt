@@ -12,29 +12,42 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.movieapp.MovieAppApplication
-import com.example.movieapp.data.MoviePopular
+import com.example.movieapp.data.Movie
 import com.example.movieapp.data.MovieRepository
 import kotlinx.coroutines.launch
 
 class HomeViewModel(private val repository: MovieRepository) : ViewModel() {
-    var uiState: HomeUiState by mutableStateOf(HomeUiState.Success())
+    var moviePopularUiState: MoviePopularUiState by mutableStateOf(MoviePopularUiState.Success())
+        private set
+    var searchMovieUiState: SearchMovieUiState by mutableStateOf(SearchMovieUiState.Success())
         private set
 
-    fun getMovies() {
-        uiState = HomeUiState.Loading
+    fun getPopularMovies() {
+        moviePopularUiState = MoviePopularUiState.Loading
         viewModelScope.launch {
-            uiState = try {
+            moviePopularUiState = try {
                 val listMovie = repository.getMoviePopular()
-                HomeUiState.Success(listMovie)
+                MoviePopularUiState.Success(listMovie)
             } catch (e: Exception) {
                 Log.e(TAG, e.message.toString())
-                HomeUiState.Fail
+                MoviePopularUiState.Fail
             }
 
         }
     }
+    fun getSearchResultMovies(searchText: String){
+        searchMovieUiState = SearchMovieUiState.Loading
+        viewModelScope.launch {
+            searchMovieUiState = try {
+                val listMovies = repository.getSearchResult(searchText)
+                SearchMovieUiState.Success(listMovies)
+            } catch (e: Exception){
+                SearchMovieUiState.Fail
+            }
+        }
+    }
     init {
-        getMovies()
+        getPopularMovies()
     }
 
     companion object {
@@ -49,8 +62,13 @@ class HomeViewModel(private val repository: MovieRepository) : ViewModel() {
 
 }
 
-sealed interface HomeUiState {
-    data class Success(val listMovies: List<MoviePopular> = listOf()) : HomeUiState
-    object Fail : HomeUiState
-    object Loading : HomeUiState
+sealed interface MoviePopularUiState {
+    data class Success(val listMovies: List<Movie> = listOf()) : MoviePopularUiState
+    object Fail : MoviePopularUiState
+    object Loading : MoviePopularUiState
+}
+sealed interface SearchMovieUiState {
+    data class Success(val listMovies: List<Movie> = listOf()) : SearchMovieUiState
+    object Fail : SearchMovieUiState
+    object Loading : SearchMovieUiState
 }
