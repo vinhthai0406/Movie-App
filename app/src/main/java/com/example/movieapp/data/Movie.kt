@@ -11,6 +11,8 @@ class MovieResponse(
 @Serializable
 class Movie(
     val id: Int,
+    @SerialName("original_title")
+    val originalTitle: String,
     @SerialName("poster_path")
     val posterPath: String,
 )

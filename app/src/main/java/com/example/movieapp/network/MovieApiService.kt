@@ -21,5 +21,8 @@ interface MovieApiService {
     ): MovieDetail
 
     @GET("search/movie")
-    suspend fun getSearchResultMovie(@Query("query") searchText: String): MovieResponse
+    suspend fun getSearchResultMovie(
+        @Query("query") searchText: String,
+        @Query("api_key") apiKey: String = BuildConfig.TMDB_API_KEY
+    ): MovieResponse
 }

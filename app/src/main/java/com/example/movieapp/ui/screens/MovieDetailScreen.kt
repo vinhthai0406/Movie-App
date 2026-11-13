@@ -11,8 +11,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,27 +36,46 @@ import com.example.movieapp.data.Genre
 import com.example.movieapp.data.MovieDetail
 import com.example.movieapp.data.VideoResult
 import com.example.movieapp.data.VideoResultItem
-import com.example.movieapp.ui.components.ErrorUi
-import com.example.movieapp.ui.components.LoadingUi
+import com.example.movieapp.ui.components.ErrorContent
+import com.example.movieapp.ui.components.LoadingContent
 import com.example.movieapp.ui.components.YouTubeThumbnail
 import com.example.movieapp.ui.theme.MovieAppTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieDetailScreen(
     modifier: Modifier = Modifier,
-    viewModel: MovieDetailViewModel,
-    onPlay: (String) -> Unit
+    title: String,
+    movieDetailUiState: MovieDetailUiState,
+    onPlay: (String) -> Unit,
+    canNavigateBack: Boolean,
+    onNavigateBack: () -> Unit
 ) {
-    Box(modifier = modifier) {
-        when (val state = viewModel.uiState) {
-            MovieDetailUiState.Fail -> ErrorUi()
-            MovieDetailUiState.Loading -> LoadingUi()
-            is MovieDetailUiState.Success -> {
-                val movieDetail = state.movieDetail
-                if (movieDetail != null) {
-                    MovieDetailUi(movieDetail = movieDetail, onPlay = onPlay)
-                } else {
-                    ErrorUi()
+    Scaffold(
+        topBar = {
+            TopAppBar(title = { Text(title) }, navigationIcon = {
+                if (canNavigateBack) {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = null
+                        )
+                    }
+                }
+            })
+        }
+    ) { innerPadding ->
+        Box(modifier = modifier.padding(innerPadding)) {
+            when (movieDetailUiState) {
+                MovieDetailUiState.Fail -> ErrorContent()
+                MovieDetailUiState.Loading -> LoadingContent()
+                is MovieDetailUiState.Success -> {
+                    val movieDetail = movieDetailUiState.movieDetail
+                    if (movieDetail != null) {
+                        MovieDetailUi(movieDetail = movieDetail, onPlay = onPlay)
+                    } else {
+                        ErrorContent()
+                    }
                 }
             }
         }
@@ -96,7 +122,6 @@ fun MovieDetailUi(
 
         }
         Column(modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))) {
-            Text(movieDetail.originalTitle, style = MaterialTheme.typography.displaySmall)
             Row {
                 Text("Genres: ", style = MaterialTheme.typography.titleMedium)
                 Text(genres)

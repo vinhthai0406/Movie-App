@@ -14,7 +14,9 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.movieapp.MovieAppApplication
 import com.example.movieapp.data.Movie
 import com.example.movieapp.data.MovieRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 class HomeViewModel(private val repository: MovieRepository) : ViewModel() {
     var moviePopularUiState: MoviePopularUiState by mutableStateOf(MoviePopularUiState.Success())
@@ -36,10 +38,14 @@ class HomeViewModel(private val repository: MovieRepository) : ViewModel() {
         }
     }
     fun getSearchResultMovies(searchText: String){
+        Log.i("getSearchResultMovies", searchText)
+        if(searchText.isEmpty()) return
         searchMovieUiState = SearchMovieUiState.Loading
         viewModelScope.launch {
+//            delay(5_00.milliseconds)
             searchMovieUiState = try {
                 val listMovies = repository.getSearchResult(searchText)
+                Log.i("listMovies size", listMovies.size.toString())
                 SearchMovieUiState.Success(listMovies)
             } catch (e: Exception){
                 SearchMovieUiState.Fail

@@ -1,6 +1,5 @@
-package com.example.movieapp.ui.components
+package com.example.movieapp.ui.screens
 
-import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.util.Log
 import androidx.activity.ComponentActivity
