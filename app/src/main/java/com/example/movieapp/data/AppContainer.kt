@@ -10,7 +10,7 @@ interface AppContainer {
     val movieRepository: MovieRepository
 }
 
-class MovieAppContainer() : AppContainer {
+class MovieAppContainer : AppContainer {
     private val baseUrl = "https://api.themoviedb.org/3/"
     private val json = Json {
         ignoreUnknownKeys = true

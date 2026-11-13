@@ -7,5 +7,8 @@ interface MovieRepository {
 }
 
 class DefaultMovieRepository(private val movieApiService: MovieApiService) : MovieRepository {
-    override suspend fun getMoviePopular(): List<MoviePopular> = movieApiService.getMoviePopular()
+    override suspend fun getMoviePopular(): List<MoviePopular> {
+        val response = movieApiService.getMoviePopular()
+        return response.results
+    }
 }

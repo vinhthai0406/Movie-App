@@ -1,10 +1,16 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     kotlin("plugin.serialization") version "2.4.10"
 }
+val secretPropertiesFile = Properties().apply {
+    rootProject.file("secret.properties").inputStream().use{load(it)}
+}
 
 android {
+
     namespace = "com.example.movieapp"
     compileSdk {
         version = release(37)
@@ -18,6 +24,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        val tmdbApiKey = secretPropertiesFile.getProperty("TMDB_API_KEY", "")
+
+        buildConfigField("String", "TMDB_API_KEY", "\"$tmdbApiKey\"")
     }
 
     buildTypes {
@@ -34,7 +43,9 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
+
 }
 
 dependencies {
@@ -56,6 +67,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     // Coil
     implementation(libs.coil.compose)
+    implementation(libs.coil3.coil.network.okhttp)
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
