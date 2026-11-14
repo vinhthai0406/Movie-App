@@ -43,7 +43,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.example.movieapp.R
 import com.example.movieapp.data.Movie
-import com.example.movieapp.ui.IMG_BASE
+import com.example.movieapp.ui.IMAGE_BASE_URL
 import com.example.movieapp.ui.components.ErrorContent
 import com.example.movieapp.ui.components.LoadingContent
 import com.example.movieapp.ui.theme.MovieAppTheme
@@ -51,7 +51,7 @@ import com.example.movieapp.ui.theme.MovieAppTheme
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    moviePopularUiState: MoviePopularUiState,
+    popularMoviesUiState: PopularMoviesUiState,
     searchMovieUiState: SearchMovieUiState,
     onSelect: (String, String) -> Unit,
     onSearching: (String) -> Unit,
@@ -83,26 +83,26 @@ fun HomeScreen(
                         SearchMovieUiState.Fail -> ErrorContent()
                         SearchMovieUiState.Loading -> LoadingContent()
                         is SearchMovieUiState.Success -> {
-                            Log.d("searching", searchMovieUiState.listMovies.toString())
+                            Log.d("searching", searchMovieUiState.movies.toString())
 
                             GridMovies(
 
-                                listMovie = searchMovieUiState.listMovies,
+                                listMovie = searchMovieUiState.movies,
                                 onSelect = onSelect
                             )
                         }
                     }
                 } else {
-                    when (moviePopularUiState) {
-                        is MoviePopularUiState.Success -> {
+                    when (popularMoviesUiState) {
+                        is PopularMoviesUiState.Success -> {
                             GridMovies(
-                                listMovie = moviePopularUiState.listMovies,
+                                listMovie = popularMoviesUiState.listMovies,
                                 onSelect = onSelect
                             )
                         }
 
-                        MoviePopularUiState.Loading -> LoadingContent()
-                        MoviePopularUiState.Fail -> ErrorContent()
+                        PopularMoviesUiState.Loading -> LoadingContent()
+                        PopularMoviesUiState.Fail -> ErrorContent()
                     }
                 }
             }
@@ -151,7 +151,7 @@ fun ThumbnailMovieItem(modifier: Modifier = Modifier, thumbnail: String) {
     } else {
         AsyncImage(
             modifier = modifier,
-            model = "${IMG_BASE}$thumbnail",
+            model = "${IMAGE_BASE_URL}$thumbnail",
             contentDescription = null
         )
     }
@@ -168,9 +168,9 @@ private fun HomeScreenPreview() {
     )
     MovieAppTheme {
         HomeScreen(
-            moviePopularUiState = MoviePopularUiState.Success(listMovies = (1..20).map { moviePopular }),
-            searchMovieUiState = SearchMovieUiState.Success(listMovies = (1..20).map { moviePopular }),
-            onSelect = { string, string1 -> }, onSearching = {})
+            popularMoviesUiState = PopularMoviesUiState.Success(listMovies = (1..20).map { moviePopular }),
+            searchMovieUiState = SearchMovieUiState.Success(movies = (1..20).map { moviePopular }),
+            onSelect = { _, _ -> }, onSearching = {})
     }
 }
 
@@ -178,12 +178,12 @@ private fun HomeScreenPreview() {
 fun SearchBarMovie(modifier: Modifier = Modifier, onValueChange: (String) -> Unit) {
     var searchText by remember { mutableStateOf("") }
     val localFocusManager = LocalFocusManager.current
-    var isFocus by remember { mutableStateOf(false) }
+    var isFocused by remember { mutableStateOf(false) }
     Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         TextField(
             modifier = Modifier
                 .weight(1f)
-                .onFocusChanged { isFocus = it.isFocused },
+                .onFocusChanged { isFocused = it.isFocused },
             value = searchText,
             onValueChange = { newValue ->
                 onValueChange(newValue)
@@ -203,7 +203,7 @@ fun SearchBarMovie(modifier: Modifier = Modifier, onValueChange: (String) -> Uni
             ),
             shape = RoundedCornerShape(8.dp),
         )
-        if (isFocus) {
+        if (isFocused) {
             TextButton(onClick = { localFocusManager.clearFocus() }) { Text("Cancel") }
         }
     }

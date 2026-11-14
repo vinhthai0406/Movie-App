@@ -30,21 +30,21 @@ class MainActivity : ComponentActivity() {
                 val navHostController = rememberNavController()
                 NavHost(
                     navController = navHostController,
-                    startDestination = MovieApp.Starter.name
+                    startDestination = AppScreen.Home.name
                 ) {
-                    composable(MovieApp.Starter.name) {
+                    composable(AppScreen.Home.name) {
                         HomeScreen(
-                            moviePopularUiState = homeViewModel.moviePopularUiState,
+                            popularMoviesUiState = homeViewModel.PopularMoviesUiState,
                             searchMovieUiState = homeViewModel.searchMovieUiState,
                             onSelect = { movieId, movieName ->
                                 movieDetailViewModel.getMovieDetail(movieId)
-                                navHostController.navigate("${MovieApp.Detail.name}/$movieName")
+                                navHostController.navigate("${AppScreen.Detail.name}/$movieName")
                             },
                             onSearching = homeViewModel::getSearchResultMovies
                         )
                     }
                     composable(
-                        "${MovieApp.Detail.name}/{title}",
+                        "${AppScreen.Detail.name}/{title}",
                         arguments = listOf(
                             navArgument("title") {
                                 type = NavType.StringType
@@ -57,14 +57,14 @@ class MainActivity : ComponentActivity() {
                             title = title,
                             movieDetailUiState = movieDetailViewModel.uiState,
                             onPlay = { videoId ->
-                                navHostController.navigate("${MovieApp.YoutubePlayer.name}/$videoId")
+                                navHostController.navigate("${AppScreen.YoutubePlayer.name}/$videoId")
                             },
                             canNavigateBack = canNavigateBack,
                             onNavigateBack = { navHostController.popBackStack() }
                         )
                     }
                     composable(
-                        route = "${MovieApp.YoutubePlayer.name}/{videoId}",
+                        route = "${AppScreen.YoutubePlayer.name}/{videoId}",
                         arguments = listOf(
                             navArgument("videoId") {
                                 type = NavType.StringType
@@ -82,6 +82,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-enum class MovieApp {
-    Starter, Detail, YoutubePlayer
+enum class AppScreen {
+    Home, Detail, YoutubePlayer
 }

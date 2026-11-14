@@ -39,7 +39,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.example.movieapp.utils.CheckConnection
+import com.example.movieapp.utils.NetworkUtils
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
@@ -75,7 +75,7 @@ fun YoutubePlayerScreen(modifier: Modifier = Modifier, videoId: String, onBack: 
         }
     }
 
-    val isWifiConnected = remember { mutableStateOf(CheckConnection.checkIfWifiConnected(context)) }
+    val isWifiConnected = remember { mutableStateOf(NetworkUtils.isWifiConnected(context)) }
     val coroutineScope = rememberCoroutineScope()
 
     Box(

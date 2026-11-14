@@ -16,7 +16,7 @@ class MovieDetail(
     val overview: String,
     @SerialName("release_date")
     val releaseDate: String,
-    val videos: VideoResult
+    val videos: VideoResponse
 )
 
 @Serializable
@@ -26,7 +26,7 @@ class Genre(
 )
 
 @Serializable
-class VideoResultItem(
+class MovieVideo(
     val key: String,
     val name: String,
     val type: String,
@@ -34,6 +34,6 @@ class VideoResultItem(
 )
 
 @Serializable
-class VideoResult(
-    val results: List<VideoResultItem>
+class VideoResponse(
+    val results: List<MovieVideo>
 )

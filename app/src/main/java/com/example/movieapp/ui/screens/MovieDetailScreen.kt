@@ -34,8 +34,8 @@ import androidx.compose.ui.unit.dp
 import com.example.movieapp.R
 import com.example.movieapp.data.Genre
 import com.example.movieapp.data.MovieDetail
-import com.example.movieapp.data.VideoResult
-import com.example.movieapp.data.VideoResultItem
+import com.example.movieapp.data.VideoResponse
+import com.example.movieapp.data.MovieVideo
 import com.example.movieapp.ui.components.ErrorContent
 import com.example.movieapp.ui.components.LoadingContent
 import com.example.movieapp.ui.components.YouTubeThumbnail
@@ -150,9 +150,9 @@ private fun MovieDetailScreenPreview() {
         originalTitle = "Inception",
         overview = "Dom Cobb is a skilled thief who steals secrets from people's subconscious during dreams.",
         releaseDate = "2010-07-15",
-        videos = VideoResult(
+        videos = VideoResponse(
             results = listOf(
-                VideoResultItem(
+                MovieVideo(
                     key = "",
                     name = "Official Trailer",
                     type = "Trailer",

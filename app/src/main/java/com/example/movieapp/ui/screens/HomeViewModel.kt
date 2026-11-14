@@ -14,25 +14,23 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.movieapp.MovieAppApplication
 import com.example.movieapp.data.Movie
 import com.example.movieapp.data.MovieRepository
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.milliseconds
 
 class HomeViewModel(private val repository: MovieRepository) : ViewModel() {
-    var moviePopularUiState: MoviePopularUiState by mutableStateOf(MoviePopularUiState.Success())
+    var popularMoviesUiState: PopularMoviesUiState by mutableStateOf(PopularMoviesUiState.Success())
         private set
     var searchMovieUiState: SearchMovieUiState by mutableStateOf(SearchMovieUiState.Success())
         private set
 
     fun getPopularMovies() {
-        moviePopularUiState = MoviePopularUiState.Loading
+        popularMoviesUiState = PopularMoviesUiState.Loading
         viewModelScope.launch {
-            moviePopularUiState = try {
+            popularMoviesUiState = try {
                 val listMovie = repository.getMoviePopular()
-                MoviePopularUiState.Success(listMovie)
+                PopularMoviesUiState.Success(listMovie)
             } catch (e: Exception) {
                 Log.e(TAG, e.message.toString())
-                MoviePopularUiState.Fail
+                PopularMoviesUiState.Fail
             }
 
         }
@@ -68,13 +66,13 @@ class HomeViewModel(private val repository: MovieRepository) : ViewModel() {
 
 }
 
-sealed interface MoviePopularUiState {
-    data class Success(val listMovies: List<Movie> = listOf()) : MoviePopularUiState
-    object Fail : MoviePopularUiState
-    object Loading : MoviePopularUiState
+sealed interface PopularMoviesUiState {
+    data class Success(val listMovies: List<Movie> = listOf()) : PopularMoviesUiState
+    object Fail : PopularMoviesUiState
+    object Loading : PopularMoviesUiState
 }
 sealed interface SearchMovieUiState {
-    data class Success(val listMovies: List<Movie> = listOf()) : SearchMovieUiState
+    data class Success(val movies: List<Movie> = listOf()) : SearchMovieUiState
     object Fail : SearchMovieUiState
     object Loading : SearchMovieUiState
 }

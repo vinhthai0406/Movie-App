@@ -4,8 +4,8 @@ import com.example.movieapp.data.Genre
 import com.example.movieapp.data.Movie
 import com.example.movieapp.data.MovieDetail
 import com.example.movieapp.data.MovieResponse
-import com.example.movieapp.data.VideoResult
-import com.example.movieapp.data.VideoResultItem
+import com.example.movieapp.data.VideoResponse
+import com.example.movieapp.data.MovieVideo
 
 object FakeDataSource {
     val listMovies = listOf(
@@ -36,9 +36,9 @@ object FakeDataSource {
         originalTitle = "Inception",
         overview = "Dom Cobb is a skilled thief who steals secrets from people's subconscious during dreams.",
         releaseDate = "2010-07-15",
-        videos = VideoResult(
+        videos = VideoResponse(
             results = listOf(
-                VideoResultItem(
+                MovieVideo(
                     key = "",
                     name = "Official Trailer",
                     type = "Trailer",
