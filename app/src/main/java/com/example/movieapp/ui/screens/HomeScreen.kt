@@ -24,6 +24,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +39,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -46,6 +48,7 @@ import com.example.movieapp.data.Movie
 import com.example.movieapp.ui.IMAGE_BASE_URL
 import com.example.movieapp.ui.components.ErrorContent
 import com.example.movieapp.ui.components.LoadingContent
+import com.example.movieapp.ui.components.NoResultContent
 import com.example.movieapp.ui.theme.MovieAppTheme
 
 @Composable
@@ -53,6 +56,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     popularMoviesUiState: PopularMoviesUiState,
     searchMovieUiState: SearchMovieUiState,
+    searchInput: String,
     onSelect: (String, String) -> Unit,
     onSearching: (String) -> Unit,
 ) {
@@ -69,7 +73,11 @@ fun HomeScreen(
                     .onFocusChanged {
                         isSearching = it.isFocused
                     }
-                    .padding(vertical = paddingSmall), onValueChange = onSearching)
+                    .padding(vertical = paddingSmall),
+                onValueChange = onSearching,
+                isFocused = isSearching,
+                searchText = searchInput
+            )
 
             Box(
                 modifier = Modifier
@@ -91,6 +99,8 @@ fun HomeScreen(
                                 onSelect = onSelect
                             )
                         }
+
+                        SearchMovieUiState.NoResult -> NoResultContent()
                     }
                 } else {
                     when (popularMoviesUiState) {
@@ -170,29 +180,33 @@ private fun HomeScreenPreview() {
         HomeScreen(
             popularMoviesUiState = PopularMoviesUiState.Success(listMovies = (1..20).map { moviePopular }),
             searchMovieUiState = SearchMovieUiState.Success(movies = (1..20).map { moviePopular }),
-            onSelect = { _, _ -> }, onSearching = {})
+            onSelect = { _, _ -> }, onSearching = {}, searchInput = "")
     }
 }
 
 @Composable
-fun SearchBarMovie(modifier: Modifier = Modifier, onValueChange: (String) -> Unit) {
-    var searchText by remember { mutableStateOf("") }
+fun SearchBarMovie(
+    modifier: Modifier = Modifier,
+    onValueChange: (String) -> Unit,
+    isFocused: Boolean,
+    searchText: String
+) {
     val localFocusManager = LocalFocusManager.current
-    var isFocused by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        localFocusManager.clearFocus()
+    }
     Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         TextField(
             modifier = Modifier
-                .weight(1f)
-                .onFocusChanged { isFocused = it.isFocused },
+                .weight(1f),
             value = searchText,
             onValueChange = { newValue ->
                 onValueChange(newValue)
-                searchText = newValue
             },
-            placeholder = { Text("Search") },
+            placeholder = { Text(stringResource(R.string.search_bar_placeholder)) },
             prefix = {
                 Icon(
-                    modifier = Modifier.padding(end = 8.dp),
+                    modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_small)),
                     imageVector = Icons.Default.Search,
                     contentDescription = null
                 )
@@ -201,10 +215,13 @@ fun SearchBarMovie(modifier: Modifier = Modifier, onValueChange: (String) -> Uni
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent
             ),
-            shape = RoundedCornerShape(8.dp),
+            shape = RoundedCornerShape(dimensionResource(R.dimen.radius_small)),
         )
         if (isFocused) {
-            TextButton(onClick = { localFocusManager.clearFocus() }) { Text("Cancel") }
+            TextButton(onClick = {
+                localFocusManager.clearFocus()
+                onValueChange("")
+            }) { Text(stringResource(R.string.cancel)) }
         }
     }
 
@@ -218,6 +235,8 @@ private fun SearchBarPreview() {
             SearchBarMovie(
                 modifier = Modifier.padding(12.dp),
                 onValueChange = { },
+                isFocused = false,
+                searchText = ""
             )
         }
     }

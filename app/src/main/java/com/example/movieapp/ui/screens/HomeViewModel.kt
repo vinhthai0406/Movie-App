@@ -14,13 +14,23 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.movieapp.MovieAppApplication
 import com.example.movieapp.data.Movie
 import com.example.movieapp.data.MovieRepository
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 class HomeViewModel(private val repository: MovieRepository) : ViewModel() {
     var popularMoviesUiState: PopularMoviesUiState by mutableStateOf(PopularMoviesUiState.Success())
         private set
     var searchMovieUiState: SearchMovieUiState by mutableStateOf(SearchMovieUiState.Success())
         private set
+    var searchInput = MutableStateFlow("")
+        private set
+    val searchInputUiState = searchInput.asStateFlow()
 
     fun getPopularMovies() {
         popularMoviesUiState = PopularMoviesUiState.Loading
@@ -35,23 +45,39 @@ class HomeViewModel(private val repository: MovieRepository) : ViewModel() {
 
         }
     }
-    fun getSearchResultMovies(searchText: String){
-        Log.i("getSearchResultMovies", searchText)
-        if(searchText.isEmpty()) return
-        searchMovieUiState = SearchMovieUiState.Loading
+
+    @OptIn(FlowPreview::class)
+    private fun observeSearchText() {
         viewModelScope.launch {
-//            delay(5_00.milliseconds)
-            searchMovieUiState = try {
-                val listMovies = repository.getSearchResult(searchText)
-                Log.i("listMovies size", listMovies.size.toString())
-                SearchMovieUiState.Success(listMovies)
-            } catch (e: Exception){
-                SearchMovieUiState.Fail
+            searchInput.onEach { query ->
+                searchMovieUiState = if (query.isBlank()) {
+                    SearchMovieUiState.Success()
+                } else {
+                    SearchMovieUiState.Loading
+                }
+            }.debounce(500.milliseconds).distinctUntilChanged().collect { query ->
+                if (query.isEmpty()) return@collect
+                searchMovieUiState = try {
+                    val listMovies = repository.getSearchResult(query)
+                    if (listMovies.isEmpty()) {
+                        SearchMovieUiState.NoResult
+                    } else {
+                        SearchMovieUiState.Success(listMovies)
+                    }
+                } catch (e: Exception) {
+                    SearchMovieUiState.Fail
+                }
             }
         }
     }
+
+    fun updateSearchText(text: String) {
+        searchInput.value = text
+    }
+
     init {
         getPopularMovies()
+        observeSearchText()
     }
 
     companion object {
@@ -71,8 +97,10 @@ sealed interface PopularMoviesUiState {
     object Fail : PopularMoviesUiState
     object Loading : PopularMoviesUiState
 }
+
 sealed interface SearchMovieUiState {
     data class Success(val movies: List<Movie> = listOf()) : SearchMovieUiState
+    object NoResult : SearchMovieUiState
     object Fail : SearchMovieUiState
     object Loading : SearchMovieUiState
 }

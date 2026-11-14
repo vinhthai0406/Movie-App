@@ -65,14 +65,19 @@ fun MovieDetailScreen(
             })
         }
     ) { innerPadding ->
-        Box(modifier = modifier.padding(innerPadding)) {
+        Box(
+            modifier = modifier
+                .padding(innerPadding)
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
             when (movieDetailUiState) {
                 MovieDetailUiState.Fail -> ErrorContent()
                 MovieDetailUiState.Loading -> LoadingContent()
                 is MovieDetailUiState.Success -> {
                     val movieDetail = movieDetailUiState.movieDetail
                     if (movieDetail != null) {
-                        MovieDetailUi(movieDetail = movieDetail, onPlay = onPlay)
+                        MovieDetailContent(modifier = Modifier.fillMaxSize(), movieDetail = movieDetail, onPlay = onPlay)
                     } else {
                         ErrorContent()
                     }
@@ -84,7 +89,7 @@ fun MovieDetailScreen(
 }
 
 @Composable
-fun MovieDetailUi(
+fun MovieDetailContent(
     modifier: Modifier = Modifier,
     movieDetail: MovieDetail,
     onPlay: (String) -> Unit
@@ -135,9 +140,24 @@ fun MovieDetailUi(
 
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun MovieDetailScreenPreview() {
+    MovieAppTheme {
+        MovieDetailScreen(
+            title = "",
+            movieDetailUiState = MovieDetailUiState.Fail,
+            onPlay = { },
+            canNavigateBack = true,
+            onNavigateBack = { }
+        )
+    }
+
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun MovieDetailContentPreview() {
     val inceptionDetail = MovieDetail(
         id = 27205,
         genres = listOf(
@@ -162,7 +182,11 @@ private fun MovieDetailScreenPreview() {
         )
     )
     MovieAppTheme {
-        MovieDetailUi(modifier = Modifier.fillMaxSize(), movieDetail = inceptionDetail, onPlay = {})
+        MovieDetailContent(
+            modifier = Modifier.fillMaxSize(),
+            movieDetail = inceptionDetail,
+            onPlay = {})
     }
+
 
 }

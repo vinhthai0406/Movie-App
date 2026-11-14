@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -26,7 +27,7 @@ class MainActivity : ComponentActivity() {
                 val homeViewModel: HomeViewModel = viewModel(factory = HomeViewModel.Factory)
                 val movieDetailViewModel: MovieDetailViewModel =
                     viewModel(factory = MovieDetailViewModel.Factory)
-
+                val searchInput = homeViewModel.searchInput.collectAsState()
                 val navHostController = rememberNavController()
                 NavHost(
                     navController = navHostController,
@@ -34,13 +35,14 @@ class MainActivity : ComponentActivity() {
                 ) {
                     composable(AppScreen.Home.name) {
                         HomeScreen(
-                            popularMoviesUiState = homeViewModel.PopularMoviesUiState,
+                            popularMoviesUiState = homeViewModel.popularMoviesUiState,
                             searchMovieUiState = homeViewModel.searchMovieUiState,
                             onSelect = { movieId, movieName ->
                                 movieDetailViewModel.getMovieDetail(movieId)
                                 navHostController.navigate("${AppScreen.Detail.name}/$movieName")
                             },
-                            onSearching = homeViewModel::getSearchResultMovies
+                            onSearching = homeViewModel::updateSearchText,
+                            searchInput = searchInput.value
                         )
                     }
                     composable(

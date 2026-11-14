@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Movie App</string>
     <string name="some_went_wrong">Something went wrong</string>
+    <string name="search_bar_placeholder">Search</string>
+    <string name="cancel">Cancel</string>
+    <string name="no_result">No movies match your search</string>
 </resources>
